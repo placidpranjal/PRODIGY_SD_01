@@ -1,0 +1,94 @@
+public class SudokuSolver {
+
+    private static final int SIZE = 9;
+    private static final int SUBGRIDSIZE = 3;
+
+    // Main function to solve the Sudoku
+    public boolean solveSudoku(int[][] board) {
+        return solve(board);
+    }
+
+    // Function to solve the Sudoku using backtracking
+    private boolean solve(int[][] board) {
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (board[row][col] == 0) { // Find an empty cell
+                    for (int num = 1; num <= SIZE; num++) { // Try numbers 1-9
+                        if (isValid(board, row, col, num)) {
+                            board[row][col] = num; // Place the number
+                            if (solve(board)) { // Recursively try to solve the rest
+                                return true;
+                            }
+                            board[row][col] = 0; // Backtrack if not valid
+                        }
+                    }
+                    return false; // If no number from 1-9 works, return false
+                }
+            }
+        }
+        return true; // If no empty cell is found, Sudoku is solved
+    }
+
+    // Check if it's safe to place the number in the cell
+    private boolean isValid(int[][] board, int row, int col, int num) {
+        // Check the row
+        for (int i = 0; i < SIZE; i++) {
+            if (board[row][i] == num) {
+                return false;
+            }
+        }
+
+        // Check the column
+        for (int i = 0; i < SIZE; i++) {
+            if (board[i][col] == num) {
+                return false;
+            }
+        }
+
+        // Check the 3x3 subgrid
+        int startRow = row - row % SUBGRIDSIZE;
+        int startCol = col - col % SUBGRIDSIZE;
+        for (int i = startRow; i < startRow + SUBGRIDSIZE; i++) {
+            for (int j = startCol; j < startCol + SUBGRIDSIZE; j++) {
+                if (board[i][j] == num) {
+                    return false;
+                }
+            }
+        }
+
+        return true; // Number can be placed
+    }
+
+    // Print the Sudoku board
+    public void printBoard(int[][] board) {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    // Main function to test the solver
+    public static void main(String[] args) {
+        int[][] board = {
+            {5, 3, 0, 0, 7, 0, 0, 0, 0},
+            {6, 0, 0, 1, 9, 5, 0, 0, 0},
+            {0, 9, 8, 0, 0, 0, 0, 6, 0},
+            {8, 0, 0, 0, 6, 0, 0, 0, 3},
+            {4, 0, 0, 8, 0, 3, 0, 0, 1},
+            {7, 0, 0, 0, 2, 0, 0, 0, 6},
+            {0, 6, 0, 0, 0, 0, 2, 8, 0},
+            {0, 0, 0, 4, 1, 9, 0, 0, 5},
+            {0, 0, 0, 0, 8, 0, 0, 7, 9}
+        };
+
+        SudokuSolver solver = new SudokuSolver();
+        if (solver.solveSudoku(board)) {
+            System.out.println("Sudoku solved!");
+            solver.printBoard(board);
+        } else {
+            System.out.println("No solution exists.");
+        }
+    }
+}
